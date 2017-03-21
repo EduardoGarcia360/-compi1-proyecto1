@@ -173,12 +173,23 @@ public class Estados {
                 paso_a = metodo_concatenar(contenido, aa, posicion_en_lista, estado_qn);
                 break;
             case "|":
+                //como es or envio los siguientes dos datos en la lista
                 aa=contenido.get(posicion_en_lista+1);
                 ab=contenido.get(posicion_en_lista+2);
                 posicion_en_lista++;
                 posicion_en_lista++;
-                paso_a=metodo_or(contenido, aa, ab, posicion_en_lista, estado_qn, primero_a_or, 0);
+                /*
+                los datos retornados serian: segundo_b_or<%>final_or<%>relaciones
+                segundo_b_or: donde continuara numerando el siguiente estado_qn (0)
+                final_or: donde empezara el siguiente estado (1)
+                relaciones: codigo de graphviz (2)
+                */
+                String tmp =metodo_or(contenido, aa, ab, posicion_en_lista, estado_qn, primero_a_or, 0);
+                String[] datos = tmp.split("<%>");
                 
+                estado_qn = Integer.parseInt(datos[0]);
+                segundo_a_or = Integer.parseInt(datos[1]);
+                paso_a = datos[2];
                 break;
             case "*":
                 break;
