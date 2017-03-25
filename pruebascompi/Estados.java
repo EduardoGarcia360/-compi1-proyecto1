@@ -50,7 +50,9 @@ public class Estados {
                 mostrar(tmp);
                 break;
             case "+":
-                metodo_almenos_uno();
+                a = contenido.get(1);
+                tmp = metodo_almenos_uno(contenido, a, 1, estado_inicio, 0, 1);
+                mostrar(tmp);
                 break;
         }
         
@@ -99,6 +101,21 @@ public class Estados {
                 
                 break;
             case "*":
+                posicion_en_lista++;
+                aa = contenido.get(posicion_en_lista);
+                /*
+                datos retornados: final_cero_mas<%>posicion_en_lista<%>relaciones
+                (0) final_cero_mas: donde finalizo la transicion
+                (1) posicion_en_lista
+                (2) codigo de graphviz
+                */
+                String tmp_cero = metodo_cero_o_mas(contenido, aa, posicion_en_lista, estado_qn, inicio_concat, 0);
+                String[] datos_cero = tmp_cero.split("<%>");
+                
+                intermedio_concat = Integer.parseInt(datos_cero[0]);
+                estado_qn = Integer.parseInt(datos_cero[0]);
+                posicion_en_lista = Integer.parseInt(datos_cero[1]);
+                parte_a = datos_cero[2];
                 break;
             case "?":
                 break;
@@ -153,16 +170,17 @@ public class Estados {
                 posicion_en_lista++;
                 ba = contenido.get(posicion_en_lista);
                 /*
-                los datos retornados serian: final_cero_mas<%>relaciones
-                (0) final_cero_mas: estado donde termino la anterior transicion
-                (1) relaciones: codigo de graphviz
+                datos retornados: final_cero_mas<%>posicion_en_lista<%>relaciones
+                (0) final_cero_mas: donde finalizo la transicion
+                (1) posicion_en_lista
+                (2) codigo de graphviz
                 */
                 System.out.println("ba: "+ba+"\nposicion en lista: "+posicion_en_lista+"\nestado qn: "+estado_qn);
                 String tmp_b_concat = metodo_cero_o_mas(contenido, ba, posicion_en_lista, estado_qn, intermedio_concat, 0);
                 String[] datos_cero = tmp_b_concat.split("<%>");
                 
                 final_concat = Integer.parseInt(datos_cero[0]);
-                parte_b = datos_cero[1];
+                parte_b = datos_cero[2];
                 break;
             case "?":
                 break;
@@ -175,7 +193,7 @@ public class Estados {
                 parte_b="\"q"+intermedio_concat+"\"->\"q"+final_concat+"\" [label=\""+transicion_b+"\"];\n";
                 break;
         }
-        concatenacion = final_concat +"<%>"+parte_a + parte_b;
+        concatenacion = final_concat + "<%>" + posicion_en_lista + "<%>" + parte_a+parte_b;
         return concatenacion;
     }
     
@@ -263,6 +281,25 @@ public class Estados {
                 //System.out.println("posicion en lista despues de regresar de a: "+ posicion_en_lista);
                 break;
             case "*":
+                aa = contenido.get(posicion_en_lista);
+                /*
+                datos retornados: final_cero_mas<%>posicion_en_lista<%>relaciones
+                (0) final_cero_mas: donde finalizo la transicion
+                (1) posicion_en_lista
+                (2) codigo de graphviz
+                */
+                String tmp_cero = metodo_cero_o_mas(contenido, aa, posicion_en_lista, estado_qn, primero_a_or, 0);
+                String[] datos_cero = tmp_cero.split("<%>");
+                
+                segundo_a_or = Integer.parseInt(datos_cero[0]);
+                estado_qn = Integer.parseInt(datos_cero[0]);
+                
+                posicion_en_lista = Integer.parseInt(datos_cero[1]);
+                posicion_en_lista++;
+                paso_a = datos_cero[2];
+                
+                //nueva transicion b
+                transicion_b = contenido.get(posicion_en_lista);
                 break;
             case "?":
                 break;
@@ -321,7 +358,21 @@ public class Estados {
                 posicion_en_lista = Integer.parseInt(datos[3]);
                 break;
             case "*":
+                posicion_en_lista++;
+                ba = contenido.get(posicion_en_lista);
+                /*
+                datos retornados: final_cero_mas<%>posicion_en_lista<%>relaciones
+                (0) final_cero_mas: donde finalizo la transicion
+                (1) posicion_en_lista
+                (2) codigo de graphviz
+                */
+                String tmp_cero = metodo_cero_o_mas(contenido, ba, posicion_en_lista, estado_qn, primero_b_or, 0);
+                String[] datos_cero = tmp_cero.split("<%>");
                 
+                segundo_b_or = Integer.parseInt(datos_cero[0]);
+                estado_qn = Integer.parseInt(datos_cero[0]);
+                posicion_en_lista = Integer.parseInt(datos_cero[1]);
+                paso_b = datos_cero[2];
                 break;
             case "?":
                 break;
@@ -374,12 +425,20 @@ public class Estados {
                 posicion_en_lista++;
                 String a = contenido.get(posicion_en_lista);
                 /*
-                retorno de concatenar: final_concat<%>relaciones
+                retorno de concatenar: final_concat<%>posicion_en_lista<%>relaciones
                 */
                 String tmp_concat = metodo_concatenar(contenido, a, posicion_en_lista, estado_qn);
                 String [] datos_concat = tmp_concat.split("<%>");
+                
                 regrecion_cero_mas = Integer.parseInt(datos_concat[0]);
-                paso_a = datos_concat[1];
+                estado_qn = Integer.parseInt(datos_concat[0]);
+                posicion_en_lista = Integer.parseInt(datos_concat[1]);
+                paso_a = datos_concat[2];
+                
+                //***-------- segundo paso epsilon
+                estado_qn++;
+                final_cero_mas=estado_qn;
+                segundo_epsilon = "\"q"+regrecion_cero_mas+"\"->\"q"+final_cero_mas+"\" [label=\"\u03B5\"];\n";
                 break;
             case "|":
                 //como es or envio los siguientes dos datos en la lista
@@ -427,6 +486,7 @@ public class Estados {
                 
                 regrecion_cero_mas = Integer.parseInt(datos_cero[0]);
                 estado_qn = Integer.parseInt(datos_cero[0]);
+                posicion_en_lista = Integer.parseInt(datos_cero[1]);
                 paso_a = datos_cero[2];
                 //***--------------------- segunda transicion epsilon
                 estado_qn++;
@@ -436,6 +496,28 @@ public class Estados {
             case "?":
                 break;
             case "+":
+                posicion_en_lista++;
+                String a_uno = contenido.get(posicion_en_lista);
+                
+                /*
+                datos retornados: final_cero_mas<%>posicion_en_lista<%>relaciones
+                (0) final_uno_mas: donde finalizo la transicion
+                (1) posicion_en_lista
+                (2) codigo de graphviz
+                */
+                
+                String tmp_uno = metodo_almenos_uno(contenido, a_uno, posicion_en_lista, estado_qn, primero_cero_mas, 0);
+                String[] datos_uno = tmp_uno.split("<%>");
+                
+                regrecion_cero_mas = Integer.parseInt(datos_uno[0]);
+                estado_qn = Integer.parseInt(datos_uno[0]);
+                posicion_en_lista = Integer.parseInt(datos_uno[1]);
+                paso_a = datos_uno[2];
+                
+                //***--------------------- segunda transicion epsilon
+                estado_qn++;
+                final_cero_mas=estado_qn;
+                segundo_epsilon = "\"q"+regrecion_cero_mas+"\"->\"q"+final_cero_mas+"\" [label=\"\u03B5\"];\n";
                 break;
             default:
                 //solo es un id
@@ -462,10 +544,143 @@ public class Estados {
         return cero_mas;
     }
     
-    private void metodo_almenos_uno(){
+    private String metodo_almenos_uno(LinkedList<String> contenido, String transicion_a, int posicion_en_lista, int estado_qn, int principio, int aob){
         //+a
+        int inicial_uno_mas, primero_uno_mas, regrecion_uno_mas=0, final_uno_mas=0;
+        String primer_epsilon, paso_a="", segundo_epsilon="", regrecion_epsilon, almenos_uno="";
+
         
+        //***--------- primer epsilon
+        if(aob==1){
+            //aun no tiene transicion
+            inicial_uno_mas = estado_qn;
+        }else{
+            //ya hay una transicion
+            inicial_uno_mas = principio;
+        }
         
+        primero_uno_mas = inicial_uno_mas + 1;
+        estado_qn++;
+        primer_epsilon="\"q"+inicial_uno_mas+"\"->\"q"+primero_uno_mas+"\" [label=\"\u03B5\"];\n";
+        
+        //***---------- paso a
+        String a;
+        switch(transicion_a){
+            case ".":
+                posicion_en_lista++;
+                a = contenido.get(posicion_en_lista);
+                /*
+                retorno de concatenar: final_concat<%>posicion_en_lista<%>relaciones
+                */
+                String tmp_concat = metodo_concatenar(contenido, a, posicion_en_lista, estado_qn);
+                String [] datos_concat = tmp_concat.split("<%>");
+                
+                regrecion_uno_mas = Integer.parseInt(datos_concat[0]);
+                estado_qn = Integer.parseInt(datos_concat[0]);
+                posicion_en_lista = Integer.parseInt(datos_concat[1]);
+                paso_a = datos_concat[2];
+                
+                //***--------- segunda transicion epsilon
+                estado_qn++;
+                final_uno_mas = estado_qn;
+                segundo_epsilon = "\"q"+regrecion_uno_mas+"\"->\"q"+final_uno_mas+"\" [label=\"\u03B5\"];\n";
+                break;
+            case "|":
+                //como es or envio los siguientes dos datos en la lista
+                posicion_en_lista++;
+                String aa = contenido.get(posicion_en_lista);
+                posicion_en_lista++;
+                String ab = contenido.get(posicion_en_lista);
+                
+                //System.out.println("aa tiene: "+aa+"\nab tiene: "+ab);
+                
+                /*
+                los datos retornados serian: segundo_b_or<%>final_or<%>relaciones<%>posicion_en_lista
+                (0) segundo_b_or: donde continuara numerando el siguiente estado_qn 
+                (1) final_or: donde empezara el siguiente estado 
+                (2) relaciones: codigo de graphviz 
+                (3) posicion_en_lista
+                */
+                
+                String tmp_or = metodo_or(contenido, aa, ab, posicion_en_lista, estado_qn, primero_uno_mas, 0);
+                String[] datos_or = tmp_or.split("<%>");
+                
+                estado_qn = Integer.parseInt(datos_or[1]);
+                regrecion_uno_mas = Integer.parseInt(datos_or[1]);
+                paso_a = datos_or[2];
+                posicion_en_lista = Integer.parseInt(datos_or[3]);
+                
+                //***--------------------- segunda transicion epsilon
+                estado_qn++;
+                final_uno_mas = estado_qn;
+                segundo_epsilon = "\"q"+regrecion_uno_mas+"\"->\"q"+final_uno_mas+"\" [label=\"\u03B5\"];\n";
+                break;
+            case "*":
+                posicion_en_lista++;
+                String aa_ = contenido.get(posicion_en_lista);
+                
+                /*
+                datos retornados: final_cero_mas<%>posicion_en_lista<%>relaciones
+                (0) final_cero_mas: donde finalizo la transicion
+                (1) posicion_en_lista
+                (2) codigo de graphviz
+                */
+                
+                String tmp_cero = metodo_cero_o_mas(contenido, aa_, posicion_en_lista, estado_qn, primero_uno_mas, 0);
+                String[] datos_cero = tmp_cero.split("<%>");
+                
+                regrecion_uno_mas = Integer.parseInt(datos_cero[0]);
+                estado_qn = Integer.parseInt(datos_cero[0]);
+                posicion_en_lista = Integer.parseInt(datos_cero[1]);
+                paso_a = datos_cero[2];
+                //***--------------------- segunda transicion epsilon
+                estado_qn++;
+                final_uno_mas=estado_qn;
+                segundo_epsilon = "\"q"+regrecion_uno_mas+"\"->\"q"+final_uno_mas+"\" [label=\"\u03B5\"];\n";
+                break;
+            case "?":
+                break;
+            case "+":
+                posicion_en_lista++;
+                a = contenido.get(posicion_en_lista);
+                
+                /*
+                datos retornados: final_cero_mas<%>posicion_en_lista<%>relaciones
+                (0) final_uno_mas: donde finalizo la transicion
+                (1) posicion_en_lista
+                (2) codigo de graphviz
+                */
+                
+                String tmp_uno = metodo_almenos_uno(contenido, a, posicion_en_lista, estado_qn, primero_uno_mas, 0);
+                String[] datos_uno = tmp_uno.split("<%>");
+                
+                regrecion_uno_mas = Integer.parseInt(datos_uno[0]);
+                estado_qn = Integer.parseInt(datos_uno[0]);
+                posicion_en_lista = Integer.parseInt(datos_uno[1]);
+                paso_a = datos_uno[2];
+                
+                //***--------------------- segunda transicion epsilon
+                estado_qn++;
+                final_uno_mas=estado_qn;
+                segundo_epsilon = "\"q"+regrecion_uno_mas+"\"->\"q"+final_uno_mas+"\" [label=\"\u03B5\"];\n";
+                break;
+            default:
+                regrecion_uno_mas = primero_uno_mas + 1;
+                paso_a = "\"q"+primero_uno_mas+"\"->\"q"+regrecion_uno_mas+"\" [label=\""+transicion_a+"\"];\n";
+                estado_qn++;
+                
+                //*** ------------ segundo paso epsilon
+                final_uno_mas = regrecion_uno_mas + 1;
+                estado_qn++;
+                segundo_epsilon = "\"q"+regrecion_uno_mas+"\"->\"q"+final_uno_mas+"\" [label=\"\u03B5\"];\n";
+                break;
+        }
+        
+        //*** ------------ regrecion epsilon
+        regrecion_epsilon = "\"q"+regrecion_uno_mas+"\"->\"q"+primero_uno_mas+"\" [label=\"\u03B5\"];\n";
+        
+        almenos_uno = final_uno_mas + "<%>" + posicion_en_lista + "<%>" + primer_epsilon+paso_a+segundo_epsilon+regrecion_epsilon;
+        return almenos_uno;
     }
     
     private void metodo_opcional(){
