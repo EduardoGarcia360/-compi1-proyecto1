@@ -16,6 +16,7 @@ public class Pruebascompi {
      */
     public static void main(String[] args) {
         // TODO code application logic here
+    	//test desde eclipse
         ventana v = new ventana();
         v.show();
     }
