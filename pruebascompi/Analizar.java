@@ -8,7 +8,7 @@ package pruebascompi;
 import java.util.LinkedList;
 
 /**
- *
+ *test2 desde eclipse
  * @author Eduardo Garcia
  */
 public class Analizar {

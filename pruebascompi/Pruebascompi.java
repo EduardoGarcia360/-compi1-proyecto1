@@ -19,6 +19,7 @@ public class Pruebascompi {
     	//test desde eclipse
         ventana v = new ventana();
         v.show();
+        //test2 desde eclipse
     }
     
 }
